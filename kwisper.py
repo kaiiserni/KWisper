@@ -27,6 +27,7 @@ class KwisperApp(rumps.App):
         super().__init__("🎤", quit_button=None)
         logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s - %(levelname)s - %(message)s')
+        self.is_transcribing = False
 
         # Load config settings
         self.config = config
@@ -113,6 +114,14 @@ class KwisperApp(rumps.App):
         try:
             key_str = str(key)
             current_time = time.time()
+
+            # Handle Escape key during recording or transcribing
+            if key == keyboard.Key.esc and (self.recording or self.is_transcribing):
+                if self.recording:
+                    self.stop_recording()
+                self.is_transcribing = False
+                self.recording_window.orderOut_(None)
+                return
 
             # Process Option key events
             if '<58>' not in key_str and 'Key.alt' not in key_str:
@@ -223,6 +232,7 @@ class KwisperApp(rumps.App):
             return
 
         def transcribe_work():
+            self.is_transcribing = True
             audio_data = np.concatenate(self.audio_data, axis=0)
 
             # Save to temporary WAV file
@@ -239,7 +249,7 @@ class KwisperApp(rumps.App):
                             prompt=self.prompt
                         )
 
-                    if transcript.text:
+                    if transcript.text and self.is_transcribing:
                         text = transcript.text.strip()
                         logging.info("Transcription completed")
 
@@ -267,6 +277,7 @@ class KwisperApp(rumps.App):
 
                 finally:
                     os.unlink(temp_audio.name)
+                    self.is_transcribing = False
 
         # Show status before starting transcription
         self.recording_window.orderFrontRegardless()
