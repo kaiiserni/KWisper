@@ -34,6 +34,8 @@ class KwisperApp(rumps.App):
         self.model = self.config["whisper"]["model"]
         self.language = self.config["whisper"]["language"]
         self.prompt = self.config["whisper"].get("prompt", "")
+        self.restore_clipboard = self.config.get("clipboard", {}).get("restore_previous", True)
+        self.previous_clipboard_content = None
 
         self.recording = False
         self.audio_data = []
@@ -291,6 +293,12 @@ class KwisperApp(rumps.App):
 
     def paste_text(self, text):
         pasteboard = NSPasteboard.generalPasteboard()
+        
+        # Store previous clipboard content if restoration is enabled
+        if self.restore_clipboard:
+            self.previous_clipboard_content = pasteboard.stringForType_(NSStringPboardType)
+        
+        # Set new content
         pasteboard.clearContents()
         pasteboard.setString_forType_(text, NSStringPboardType)
 
@@ -306,6 +314,12 @@ class KwisperApp(rumps.App):
         kb.release('v')
         time.sleep(0.05)
         kb.release(keyboard.Key.cmd)
+
+        # Restore previous clipboard content if enabled
+        if self.restore_clipboard and self.previous_clipboard_content:
+            time.sleep(0.1)  # Give a moment for the paste to complete
+            pasteboard.clearContents()
+            pasteboard.setString_forType_(self.previous_clipboard_content, NSStringPboardType)
 
     @rumps.clicked("Quit")
     def quit_app(self, _):
