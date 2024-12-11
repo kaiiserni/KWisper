@@ -32,6 +32,8 @@ whisper:
   model: "whisper-1" # OpenAI Whisper model to use
   language: "en" # Language code for transcription
   prompt: "Not a native English speaker. Improve grammar where needed." # Optional prompt to guide transcription
+clipboard:
+  restore_previous: true # Whether to restore previous clipboard content after pasting transcription
 ```
 
 ## Usage
