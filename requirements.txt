@@ -7,3 +7,4 @@ pynput>=1.7.6
 rumps>=0.4.0
 numpy>=1.24.0
 PyYAML>=6.0.1
+paperclip>=2.7.2
