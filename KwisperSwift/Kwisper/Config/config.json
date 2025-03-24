@@ -1,0 +1,8 @@
+{
+  "openAIAPIKey": "",
+  "recordingShortcut": {
+    "keyCode": 9,
+    "modifiers": 10
+  },
+  "maxRecordingDurationSeconds": 60.0
+}
